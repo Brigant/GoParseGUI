@@ -30,10 +30,10 @@ func findValue(str string, like string) string {
 }
 
 //Function for parsing csv file
-func parse(path string) {
-	csvFile, _ := os.Open(path)
+func parse(path_for_read string, path_for_save string) {
+	csvFile, _ := os.Open(path_for_read)
 	reader := csv.NewReader(csvFile)
-	outputFile, err := os.Create("output.csv")
+	outputFile, err := os.Create(path_for_save)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,7 +106,7 @@ func main() {
 	icon, _ := fyne.LoadResourceFromPath("ico.png")
 	w.SetIcon(icon)
 	//info label about output file
-	output_info := widget.NewLabel("Parsing data are stored in output.csv file in program directory")
+	output_info := widget.NewLabel("You dosn't determined file path to save it")
 	output_info.Hide() //in deafault this label is hiden
 	// New Buttton
 	btn := widget.NewButton("Open .csv files", func() {
@@ -118,7 +118,7 @@ func main() {
 		file_Dialog := dialog.NewFileOpen(
 			func(r fyne.URIReadCloser, _ error) {
 				// read files
-				path := r.URI().Path()
+				path_for_read := r.URI().Path()
 
 				data, _ := ioutil.ReadAll(r)
 				// reader will read file and store data
@@ -131,19 +131,24 @@ func main() {
 				entry.Resize(fyne.NewSize(600, 350))
 				// string() function convert byte to string
 				entry.SetText(string(result.StaticContent))
+
+				entry_save_path := widget.NewEntry()
+				entry_save_path.Resize(fyne.NewSize(500, 50))
+				entry_save_path.Move(fyne.NewPos(0, 350))
 				// Lets show and setup content
 				// tile of our new window
 				win := fyne.CurrentApp().NewWindow(
 					string(result.StaticName)) // title/name
 				btn_parse := widget.NewButton("Parse", func() {
-					parse(path)        //run main parsing function
+					parse(path_for_read, entry_save_path.Text) //run main parsing function
+					output_info.SetText("You file is located in: " + entry_save_path.Text)
 					output_info.Show() //unhide output label
 					win.Hide()         // Hide current windows
 				})
 				btn_parse.Resize(fyne.NewSize(100, 50))
-				btn_parse.Move(fyne.NewPos(250, 350))
+				btn_parse.Move(fyne.NewPos(500, 350))
 				//w.SetContent(container.NewScroll(entry))
-				win.SetContent(container.NewWithoutLayout(entry, btn_parse))
+				win.SetContent(container.NewWithoutLayout(entry, entry_save_path, btn_parse))
 				win.Resize(fyne.NewSize(600, 400))
 				// show/display content
 				win.Show()
