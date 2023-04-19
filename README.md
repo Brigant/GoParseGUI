@@ -5,7 +5,7 @@ Run in terminal to build app
 ```
 fyne package -os linux -icon ico.png
 ```
-while installing fyne the error may be happened, then chek
+while installing fyne the error may be happened, then check
 
 ```
 export GOPATH=$HOME/go
